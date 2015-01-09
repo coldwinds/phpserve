@@ -7,6 +7,9 @@ interpreter](http://www.php.net/manual/en/features.commandline.webserver.php).
 ```php
 $serve = new Nstory\Serve\Serve;
 
+// set php executable
+$serve->setPhpExecutable('path_to_php_executable or simply "php" if have environment configured');
+
 // options below are all defaults; setting them explicitly for the example
 $serve->setHost('127.0.0.1');
 $serve->setPort('8000');

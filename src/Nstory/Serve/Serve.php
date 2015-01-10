@@ -2,6 +2,10 @@
 
 namespace Nstory\Serve;
 
+use Guzzle\Http\Client;
+use Guzzle\Http\Exception\CurlException;
+use hmmmath\Fibonacci\FibonacciFactory;
+
 class Serve
 {
     private $host = '127.0.0.1';
@@ -28,8 +32,36 @@ class Serve
         register_shutdown_function(function() {
             $this->shutdown();
         });
-        sleep(1);
-        // FIXME: wait for server to start up (properly)
+        $this->pollWait();
+    }
+
+    /**
+     * Poll to test if web server is running.
+     *
+     * @see InterNations\Component\HttpMock::pollWait
+     */
+    private function pollWait()
+    {
+        $filename = md5(time()).'.php';
+        $requestUri = sprintf('http://%s:%s/%s', $this->getHost(), $this->getPort(), $filename);
+        $testFile = rtrim($this->root_directory, '/\\').'/'.$filename;
+        $content = '<?php head("HTTP/1.1 200 OK");';
+
+        file_put_contents($testFile, $content);
+
+        $client = new Client();
+
+        foreach (FibonacciFactory::sequence(50000, 10000) as $sleepTime) {
+            try{
+                usleep($sleepTime);
+                $client->head($requestUri)->send();
+                break;
+            }catch(CurlException $e){
+                continue;
+            }
+        }
+
+        unlink($testFile);
     }
 
     private function cmdline()

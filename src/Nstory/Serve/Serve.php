@@ -110,10 +110,12 @@ class Serve
         return $this->port;
     }
 
+
     /**
      * Port on which the web server will run; defaults to 8000.
+     *
      * @param int $port
-     * @param static
+     * @return $this
      */
     public function setPort($port)
     {
